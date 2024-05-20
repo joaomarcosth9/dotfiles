@@ -1,0 +1,26 @@
+live_config_reload = true
+
+import = [ "~/.config/alacritty/themes/themes/blood_moon.toml" ]
+
+[colors.primary]
+background = "#000000"
+foreground = "#e5e8e6"
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 15
+
+[font.normal]
+family = "JetBrainsMono NF"
+style = "Regular"
+
+[window]
+decorations = "buttonless"
+opacity = 0.93
+option_as_alt = "Both"
+
+[window.padding]
+x = 10
+y = 10
