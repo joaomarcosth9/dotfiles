@@ -1,0 +1,29 @@
+alias vim='nvim '
+export EDITOR="nvim "
+export VISUAL="$EDITOR"
+
+alias cd='z '
+
+alias sudo='sudo '
+alias fucking='sudo '
+alias clear="clear && printf '\e[3J'"
+alias cls='clear'
+
+alias apt='nala '
+alias cat='bat -pp '
+
+alias clip='pbcopy'
+
+alias rm='printf "[Use del, or /bin/rm.]\n"'
+alias del='trash'
+alias deldir='trash'
+alias diff='colordiff '
+
+alias ls='lsd'
+alias l='lsd'
+alias ll='lsd -l'
+alias la='lsd -la'
+alias dir='ls -lah'
+
+alias exe='chmod +x'
+alias py='python '
