@@ -1,0 +1,296 @@
+#  NOTE(koekeishiya): A list of all built-in modifier and literal keywords can
+#                     be found at https://github.com/koekeishiya/skhd/issues/1
+#
+#                     A hotkey is written according to the following rules:
+#
+#                       hotkey       = <mode> '<' <action> | <action>
+#
+#                       mode         = 'name of mode' | <mode> ',' <mode>
+#
+#                       action       = <keysym> '[' <proc_map_lst> ']' | <keysym> '->' '[' <proc_map_lst> ']'
+#                                      <keysym> ':' <command>          | <keysym> '->' ':' <command>
+#                                      <keysym> ';' <mode>             | <keysym> '->' ';' <mode>
+#
+#                       keysym       = <mod> '-' <key> | <key>
+#
+#                       mod          = 'modifier keyword' | <mod> '+' <mod>
+#
+#                       key          = <literal> | <keycode>
+#
+#                       literal      = 'single letter or built-in keyword'
+#
+#                       keycode      = 'apple keyboard kVK_<Key> values (0x3C)'
+#
+#                       proc_map_lst = * <proc_map>
+#
+#                       proc_map     = <string> ':' <command> | <string>     '~' |
+#                                      '*'      ':' <command> | '*'          '~'
+#
+#                       string       = '"' 'sequence of characters' '"'
+#
+#                       command      = command is executed through '$SHELL -c' and
+#                                      follows valid shell syntax. if the $SHELL environment
+#                                      variable is not set, it will default to '/bin/bash'.
+#                                      when bash is used, the ';' delimeter can be specified
+#                                      to chain commands.
+#
+#                                      to allow a command to extend into multiple lines,
+#                                      prepend '\' at the end of the previous line.
+#
+#                                      an EOL character signifies the end of the bind.
+#
+#                       ->           = keypress is not consumed by skhd
+#
+#                       *            = matches every application not specified in <proc_map_lst>
+#
+#                       ~            = application is unbound and keypress is forwarded per usual, when specified in a <proc_map>
+#
+#  NOTE(koekeishiya): A mode is declared according to the following rules:
+#
+#                       mode_decl = '::' <name> '@' ':' <command> | '::' <name> ':' <command> |
+#                                   '::' <name> '@'               | '::' <name>
+#
+#                       name      = desired name for this mode,
+#
+#                       @         = capture keypresses regardless of being bound to an action
+#
+#                       command   = command is executed through '$SHELL -c' and
+#                                   follows valid shell syntax. if the $SHELL environment
+#                                   variable is not set, it will default to '/bin/bash'.
+#                                   when bash is used, the ';' delimeter can be specified
+#                                   to chain commands.
+#
+#                                   to allow a command to extend into multiple lines,
+#                                   prepend '\' at the end of the previous line.
+#
+#                                   an EOL character signifies the end of the bind.
+
+
+# add an on_enter command to the default mode
+# :: default : chunkc border::color 0xff775759
+#
+# defines a new mode 'test' with an on_enter command, that captures keypresses
+# :: test @ : chunkc border::color 0xff24ccaa
+#
+# from 'default' mode, activate mode 'test'
+# cmd - x ; test
+#
+# from 'test' mode, activate mode 'default'
+# test < cmd - x ; default
+#
+# launch a new terminal instance when in either 'default' or 'test' mode
+# default, test < cmd - return : open -na /Applications/Terminal.app
+
+# application specific bindings
+#
+# cmd - n [
+#     "kitty"       : echo "hello kitty"
+#     *             : echo "hello everyone"
+#     "qutebrowser" : echo "hello qutebrowser"
+#     "terminal"    ~
+#     "finder"      : false
+# ]
+
+# specify a file that should be included as an additional config-file.
+# treated as an absolutepath if the filename begins with '/' otherwise
+# the file is relative to the path of the config-file it was loaded from.
+#
+# .load "/Users/Koe/.config/partial_skhdrc"
+# .load "partial_skhdrc"
+
+# prevent skhd from monitoring events for specific applications.
+#
+# .blacklist [
+#    "kitty"
+#    "terminal"
+#    "qutebrowser"
+# ]
+
+####### Init of commands #######
+
+# if you're having troubles finding key codes for a key just type
+# skhd --observe 
+# in a terminal and type a key. Pretty col! Or just check the wiki.
+
+# this is just a comment
+# hyper = shift + cmd + alt + option
+
+####### Shortcut Hotkeys #############
+
+# restart Yabi, SpaceBar, and SKHD
+lcmd+lalt+lshift+lctrl - r : \
+    launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"; \
+    yabai --restart-service; \
+    sketchybar --reload; \
+    skhd --reload
+
+# enter fullscreen mode for the focused container
+lcmd+lalt+lshift+lctrl - f : yabai -m window --toggle zoom-fullscreen
+
+# rotate desktop
+lcmd+lalt+lshift+lctrl - o : yabai -m space --rotate 270
+lcmd+lalt+lshift+lctrl + rshift - o : yabai -m space --rotate 90
+
+# balance size of windows
+lcmd+lalt+lshift+lctrl - e : yabai -m space --balance
+
+# window focus
+lcmd+lalt+lshift+lctrl - n : yabai -m window --focus next || yabai -m window --focus first
+lcmd+lalt+lshift+lctrl + rshift - n : yabai -m window --focus prev || yabai -m window --focus last
+alt - h : yabai -m window --focus west
+alt - j : yabai -m window --focus south
+alt - k : yabai -m window --focus north
+alt - l : yabai -m window --focus east
+
+# space focus
+lcmd+lalt+lshift+lctrl - tab : yabai -m space --focus next || yabai -m space --focus first
+lcmd+lalt+lshift+lctrl + rshift - tab : yabai -m space --focus prev || yabai -m space --focus last
+lcmd+lalt+lshift+lctrl - 1 : yabai -m space --focus 1
+lcmd+lalt+lshift+lctrl - 2 : yabai -m space --focus 2
+lcmd+lalt+lshift+lctrl - 3 : yabai -m space --focus 3
+lcmd+lalt+lshift+lctrl - 4 : yabai -m space --focus 4
+lcmd+lalt+lshift+lctrl - 5 : yabai -m space --focus 5
+lcmd+lalt+lshift+lctrl - 6 : yabai -m space --focus 6
+lcmd+lalt+lshift+lctrl - 7 : yabai -m space --focus 7
+lcmd+lalt+lshift+lctrl - 8 : yabai -m space --focus 8
+lcmd+lalt+lshift+lctrl - 9 : yabai -m space --focus 9
+
+# move windows and focus space
+lcmd+lalt+lshift+lctrl + rshift - 1 : yabai -m window --space 1 && yabai -m space --focus 1 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 2 : yabai -m window --space 2 && yabai -m space --focus 2 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 3 : yabai -m window --space 3 && yabai -m space --focus 3 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 4 : yabai -m window --space 4 && yabai -m space --focus 4 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 5 : yabai -m window --space 5 && yabai -m space --focus 5 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 6 : yabai -m window --space 6 && yabai -m space --focus 6 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 7 : yabai -m window --space 7 && yabai -m space --focus 7 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 8 : yabai -m window --space 8 && yabai -m space --focus 8 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift - 9 : yabai -m window --space 9 && yabai -m space --focus 9 && sketchybar --trigger windows_on_spaces;
+
+# move windows and stay in current space
+lcmd+lalt+lshift+lctrl + rshift + ralt - 1 : yabai -m window --space 1 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 2 : yabai -m window --space 2 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 3 : yabai -m window --space 3 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 4 : yabai -m window --space 4 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 5 : yabai -m window --space 5 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 6 : yabai -m window --space 6 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 7 : yabai -m window --space 7 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 8 : yabai -m window --space 8 && sketchybar --trigger windows_on_spaces;
+lcmd+lalt+lshift+lctrl + rshift + ralt - 9 : yabai -m window --space 9 && sketchybar --trigger windows_on_spaces;
+
+# create space
+lcmd+lalt+lshift+lctrl - c : yabai -m space --create && yabai -m window --space last && yabai -m space --focus last; \
+                             sketchybar --trigger windows_on_spaces; \
+                             sketchybar --trigger space_change;
+lcmd+lalt+lshift+lctrl + rshift - c : yabai -m space --create; \
+                                      sketchybar --trigger space_change;
+
+# destroy space
+lcmd+lalt+lshift+lctrl - x : yabai -m query --windows | jq 'map(select(."is-visible")) | .[].id' | xargs -n1 yabai -m window --close; \
+            yabai -m space --focus recent && sleep 0.1 && yabai -m space recent --destroy; \
+            sketchybar --update;
+
+# move window relatively
+alt + shift - h : yabai -m window --warp west
+alt + shift - j : yabai -m window --warp south
+alt + shift - k : yabai -m window --warp north
+alt + shift - l : yabai -m window --warp east
+
+# float windown
+lcmd+lalt+lshift+lctrl - space : yabai -m window --toggle float
+
+# Enable / Disable gaps
+lcmd+lalt+lshift+lctrl - i : yabai -m space --toggle padding; \
+            yabai -m space --toggle gap;
+
+# Enable / Disable bar
+lcmd+lalt+lshift+lctrl - s : sketchybar --bar hidden=current; \
+            yabai -m config external_bar $([ $(yabai -m config external_bar | cut -d: -f1) = 'off' ] && echo 'all' || echo 'off'):32:0
+
+### default mode bar color
+
+### resize
+# color
+:: resize @ : yabai -m config active_window_border_color 0xffff00ff
+# toggle mode
+resize < hyper - m ; default
+default < hyper - m ; resize
+resize < escape ; default
+# commands
+resize < left : yabai -m window --resize left:-50:0; \
+                yabai -m window --resize right:-50:0;
+resize < down: yabai -m window --resize bottom:50:0; \
+                yabai -m window --resize top:50:0;
+resize < up: yabai -m window --resize top:-50:0; \
+                yabai -m window --resize bottom:-50:0;
+resize < right: yabai -m window --resize right:50:0; \
+                yabai -m window --resize left:50:0;
+
+####### Unused ####### 
+
+# open terminal, blazingly fast compared to iTerm/Hyper
+# cmd + shift - return : open /Applications/iTerm.app;
+# hyper - return : open /Applications/Alacritty.app -n;
+
+### hyper mode
+# color
+# :: hypermode @ : yabai -m config active_window_border_color 0xff00ffff
+# toggle mode
+# default < hyper - a ; hypermode
+# hypermode < hyper - a ; default
+# hypermode < escape ; default
+# commands
+# hypermode < tab : yabai -m space --focus next || yabai -m space --focus first
+# hypermode < shift - tab : yabai -m space --focus prev || yabai -m space --focus last
+# hypermode < 1 : yabai -m space --focus 1
+# hypermode < 2 : yabai -m space --focus 2
+# hypermode < 3 : yabai -m space --focus 3
+# hypermode < 4 : yabai -m space --focus 4
+# hypermode < 5 : yabai -m space --focus 5
+# hypermode < 6 : yabai -m space --focus 6
+# hypermode < 7 : yabai -m space --focus 7
+# hypermode < 8 : yabai -m space --focus 8
+# hypermode < 9 : yabai -m space --focus 9
+# hypermode < h : yabai -m window --warp west
+# hypermode < j : yabai -m window --warp south
+# hypermode < k : yabai -m window --warp north
+# hypermode < l : yabai -m window --warp east
+# hypermode < o : yabai -m space --rotate 270
+# hypermode < rshift - o : yabai -m space --rotate 90
+# hypermode < e : yabai -m space --balance
+# hypermode < n : yabai -m window --focus next || yabai -m window --focus first
+# hypermode < rshift - n : yabai -m window --focus prev || yabai -m window --focus last
+
+# change layout of desktop
+# alt - e : yabai -m space --layout bsp
+# alt - s : yabai -m space --layout float
+
+# float / unfloat window and center on screen
+#alt - t : yabai -m window --toggle float;\
+#          yabai -m window --grid 4:4:1:1:2:2
+# float / unfloat window and leave in its current location
+# alt + shift - space : yabai -m window --toggle float
+#alt + ctrl - space : yabai -m window --toggle float
+
+# make floating window fill screen
+# alt + cmd - up     : yabai -m window --grid 1:1:0:0:1:1
+
+# make floating window fill left-half of screen
+# alt + cmd - left   : yabai -m window --grid 1:2:0:0:1:1
+
+# make floating window fill right-half of screen
+# alt + cmd - right  : yabai -m window --grid 1:2:1:0:1:1
+
+# create desktop, move window and stay in current workspace
+# alt + shift - n : yabai -m space --create;\
+#                   index="$(yabai -m query --spaces --display | jq 'map(select(."native-fullscreen" == 0))[-1].index')"; \
+#                   yabai -m window --space "${index}"
+
+# create desktop and follow focus
+# Note: script fails when workspace is empty due to Yabai not reporting the workspace (bug?)
+#       best to use the create + move window command instead of creating a blank window
+# alt - n : yabai -m space --create;\
+#                   index="$(yabai -m query --spaces --display | jq 'map(select(."native-fullscreen" == 0))[-1].index')"; \
+#                   yabai -m space --focus "${index}"
+
+# destroy desktop
+# hyper - w : yabai -m space --destroy
