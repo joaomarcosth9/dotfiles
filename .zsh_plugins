@@ -1,0 +1,6 @@
+plugins=(
+		zsh-autosuggestions
+		zsh-syntax-highlighting
+		zsh-fzf-history-search
+		git
+)

@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Script: diiff
+# Descrição: Wrapper pro diff com diff-so-fancy e suporte automático a arquivos e diretórios
+
+# Checa dependência diff-so-fancy
+if ! command -v diff-so-fancy >/dev/null 2>&1; then
+  echo "Erro: diff-so-fancy não está instalado ou não está no PATH."
+  exit 2
+fi
+
+# Verifica se há dois argumentos
+if [ "$#" -ne 2 ]; then
+  echo "Uso: diiff <arquivo|diretório A> <arquivo|diretório B>"
+  exit 1
+fi
+
+# Checa se os dois caminhos existem
+if [ ! -e "$1" ]; then
+  echo "Erro: '$1' não existe"
+  exit 1
+fi
+
+if [ ! -e "$2" ]; then
+  echo "Erro: '$2' não existe"
+  exit 1
+fi
+
+# Checa se tipos batem (arquivo/arquivo ou dir/dir)
+if [ -d "$1" ] && [ -d "$2" ]; then
+  diff -ru "$1" "$2" | diff-so-fancy
+elif [ -f "$1" ] && [ -f "$2" ]; then
+  diff -u "$1" "$2" | diff-so-fancy
+else
+  echo "Erro: Compare arquivos com arquivos ou diretórios com diretórios."
+  exit 1
+fi
+
